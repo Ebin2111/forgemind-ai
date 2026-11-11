@@ -1,0 +1,1 @@
+"""Test suite. Run ``pytest`` from the project root; see conftest.py for how tests are isolated."""

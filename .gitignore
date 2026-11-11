@@ -1,0 +1,19 @@
+# dependencies and build output
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# local settings (keep only .env.example in git)
+.env
+.env.local
+.env.*.local
+
+# logs and OS files
+npm-debug.log*
+.DS_Store
+Thumbs.db
+.env
+
+env.txt

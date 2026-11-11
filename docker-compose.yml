@@ -1,0 +1,86 @@
+# ForgeMind AI: run the backend (FastAPI) and frontend (Next.js) together.
+#
+#   cp .env.example .env            # add GEMINI_API_KEY, ADMIN_PASSWORD and SESSION_SECRET (production refuses to start without them)
+#   docker compose up --build -d    # dashboard: http://localhost:3000   API docs: http://localhost:8000/docs
+#   docker compose logs -f backend
+#   docker compose down             # keeps your data; add -v to delete the data volume too
+#
+# Settings come from .env (optional) and the variables below. Useful ones:
+#   BIND_ADDRESS=127.0.0.1   Interface the ports are published on. The API has no login yet, so it is
+#                            only reachable from this machine by default. Use 0.0.0.0 only behind
+#                            a reverse proxy or firewall that adds authentication.
+#   NEXT_PUBLIC_API_URL      Where the USER'S BROWSER reaches the API (baked into the frontend at build time).
+#   CORS_ORIGINS             Must contain the URL the dashboard is opened at.
+#   INSTALL_SEMANTIC=true    Build with semantic search (also set ENABLE_SEMANTIC_SEARCH=true and
+#                            raise BACKEND_MEM_LIMIT to 3g or more).
+#   APP_ENV=development      Shows /docs and /redoc (hidden when APP_ENV=production, the default here).
+
+name: forgemind
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      args:
+        INSTALL_SEMANTIC: ${INSTALL_SEMANTIC:-false}
+    image: forgemind-backend:${TAG:-latest}
+    init: true
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # Values below win over .env, so the container always uses its own paths.
+      APP_ENV: ${APP_ENV:-production}
+      DATABASE_URL: sqlite:////app/data/forgemind.db
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      ENABLE_SEMANTIC_SEARCH: ${ENABLE_SEMANTIC_SEARCH:-false}
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - forgemind-data:/app/data   # database, uploaded PDFs, passages, FAISS index, model cache
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: ${BACKEND_MEM_LIMIT:-1g}
+    logging: *default-logging
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    image: forgemind-frontend:${TAG:-latest}
+    init: true
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${FRONTEND_PORT:-3000}:3000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: ${FRONTEND_MEM_LIMIT:-512m}
+    logging: *default-logging
+
+volumes:
+  forgemind-data:

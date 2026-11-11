@@ -1,0 +1,47 @@
+.page { max-width: 1280px; margin: 0 auto; }
+
+.stats { display: flex; flex-wrap: wrap; gap: 10px 22px; color: var(--muted); font-size: 14px; }
+.stats strong { color: var(--text); font-size: 20px; font-weight: 700; margin-right: 6px; font-variant-numeric: tabular-nums; }
+
+/* drop zone */
+.drop { display: flex; align-items: center; gap: 18px; padding: 20px 22px; margin-bottom: 20px; border: 2px dashed #2a5384; border-radius: 16px; background: linear-gradient(120deg, rgba(25, 211, 197, 0.07), rgba(30, 120, 220, 0.06)); transition: border-color 0.15s, background 0.15s, transform 0.15s; flex-wrap: wrap; }
+.drop.over { border-color: var(--accent); background: rgba(25, 211, 197, 0.14); transform: scale(1.005); }
+.dropIcon { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 16px; background: #0b3036; color: var(--accent); flex: none; }
+.dropText { flex: 1 1 260px; min-width: 0; }
+.dropText strong { display: block; font-size: 17px; }
+.dropText span { color: var(--muted); font-size: 14px; }
+.progress { position: relative; height: 4px; border-radius: 2px; background: var(--border); overflow: hidden; margin-top: 10px; }
+.progress::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 40%; background: var(--accent); border-radius: 2px; animation: slide 1.1s ease-in-out infinite; }
+@keyframes slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(250%); } }
+
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { background: var(--panel); color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 600; }
+.chip:hover { color: var(--text); filter: none; }
+.chip.on { background: #0b3036; color: var(--accent); border-color: #17776f; }
+
+/* cards */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.card { display: flex; flex-direction: column; gap: 14px; padding: 18px; border: 1px solid var(--border); border-radius: 16px; background: var(--panel); transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s; animation: fade-up 0.3s ease both; }
+.card:hover { border-color: #2d5f95; transform: translateY(-2px); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3); }
+.top { display: flex; gap: 14px; align-items: flex-start; }
+.type { display: grid; place-items: center; flex: none; width: 46px; height: 56px; border-radius: 10px; background: linear-gradient(160deg, #17407a, #0e2a4a); border: 1px solid #2d5f95; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: #9fd0ff; position: relative; }
+.type::after { content: ""; position: absolute; top: -1px; right: -1px; width: 14px; height: 14px; background: var(--bg); border-bottom-left-radius: 8px; border-left: 1px solid #2d5f95; border-bottom: 1px solid #2d5f95; }
+.name { min-width: 0; flex: 1; }
+.name h3 { margin: 0; font-size: 16px; line-height: 1.3; overflow-wrap: anywhere; }
+.name span { color: var(--muted); font-size: 13px; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+.actions a.button, .actions button { flex: 0 0 auto; }
+
+/* preview */
+.passage { padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); }
+.passage header { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; color: var(--muted); font-weight: 600; }
+.passage p { font-size: 14px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; color: #d4e1f0; }
+.passage mark { background: rgba(25, 211, 197, 0.28); color: inherit; border-radius: 3px; padding: 0 2px; }
+.stack { display: grid; gap: 10px; }
+.summaryCta { display: grid; justify-items: start; gap: 10px; padding: 18px; border: 1px dashed #2a5384; border-radius: 12px; background: rgba(25, 211, 197, 0.05); }
+.summaryCta p { color: var(--muted); font-size: 14px; }
+.skeletonLine { height: 14px; border-radius: 7px; }
+
+@media (max-width: 600px) { .drop { padding: 16px; } .grid { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .card, .progress::after { animation: none; } }

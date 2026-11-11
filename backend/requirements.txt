@@ -1,0 +1,14 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.6
+pydantic-settings>=2.2
+sqlalchemy>=2.0
+python-multipart>=0.0.9
+pypdf>=4.0
+numpy>=1.26
+google-generativeai>=0.7
+httpx>=0.27
+pytest>=8.0
+# Optional semantic search (set ENABLE_SEMANTIC_SEARCH=true):
+# sentence-transformers
+# faiss-cpu

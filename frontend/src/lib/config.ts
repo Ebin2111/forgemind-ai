@@ -1,0 +1,2 @@
+/** Where the backend lives. Set NEXT_PUBLIC_API_URL in frontend/.env.local; a trailing slash is ignored. */
+export const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").replace(/\/+$/, "");

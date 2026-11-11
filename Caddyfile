@@ -1,0 +1,5 @@
+# Caddy: public entry point. {$DOMAIN} comes from .env; Caddy obtains and renews the HTTPS certificate by itself.
+{$DOMAIN} {
+	encode gzip
+	reverse_proxy frontend:3000
+}

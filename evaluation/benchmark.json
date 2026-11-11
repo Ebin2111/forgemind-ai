@@ -1,0 +1,11 @@
+{
+  "description": "Starter benchmark for retrieval and answer quality. Fill expected_document after uploading your own manuals; expected_keywords should appear in a good answer.",
+  "questions": [
+    {"id": "q1", "question": "How often should the compressor oil separator element be replaced?", "category": "maintenance", "expected_document": "", "expected_keywords": ["oil separator", "hours"]},
+    {"id": "q2", "question": "What should I check when a conveyor belt drifts to one side?", "category": "troubleshooting", "expected_document": "", "expected_keywords": ["tail pulley", "idler", "tracking"]},
+    {"id": "q3", "question": "What is the lockout/tagout procedure before servicing a hydraulic press?", "category": "safety", "expected_document": "", "expected_keywords": ["lockout", "isolate", "verify"]},
+    {"id": "q4", "question": "What causes a servo alarm on a welding robot axis?", "category": "troubleshooting", "expected_document": "", "expected_keywords": ["encoder", "servo", "brake"]},
+    {"id": "q5", "question": "What hydraulic oil grade does the press use?", "category": "specification", "expected_document": "", "expected_keywords": ["ISO VG", "oil"]},
+    {"id": "q6", "question": "How do I calibrate spindle vibration limits on the CNC machine?", "category": "maintenance", "expected_document": "", "expected_keywords": ["spindle", "vibration"]}
+  ]
+}

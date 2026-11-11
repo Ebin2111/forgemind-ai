@@ -1,0 +1,98 @@
+# ForgeMind AI on a public server (a rented Linux VPS). One address, automatic HTTPS.
+#
+#   cp .env.production.example .env     # then edit it: DOMAIN, GEMINI_API_KEY, ADMIN_*, SESSION_SECRET
+#   docker compose -f docker-compose.prod.yml up -d --build
+#   docker compose -f docker-compose.prod.yml logs -f
+#
+# Only Caddy is reachable from the internet (ports 80 and 443). Caddy gets the HTTPS certificate by itself and forwards
+# everything to the website, which forwards /api to the backend. The backend and the database are never exposed.
+
+name: forgemind
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: forgemind-backend:latest
+    init: true
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      APP_ENV: production
+      DATABASE_URL: sqlite:////app/data/forgemind.db
+      CORS_ORIGINS: https://${DOMAIN:?Set DOMAIN in .env}
+      LOGIN_ON_START: "false"          # a server restart must not sign everybody out
+      ENABLE_SEMANTIC_SEARCH: "false"
+    # The website passes the visitor's address in X-Forwarded-For; trust it (the backend is not reachable from outside).
+    command: ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1",
+              "--proxy-headers", "--forwarded-allow-ips=*"]
+    expose:
+      - "8000"
+    volumes:
+      - forgemind-data:/app/data       # database, uploaded PDFs, search index: this is what must be backed up
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    logging: *default-logging
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ""                # empty = the browser calls this same site (/api/...), no CORS needed
+        BACKEND_URL: http://backend:8000       # where the website forwards /api inside Docker
+    image: forgemind-frontend:latest
+    init: true
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    expose:
+      - "3000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+    logging: *default-logging
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - frontend
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in .env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data                # the HTTPS certificate lives here
+      - caddy-config:/config
+    logging: *default-logging
+
+volumes:
+  forgemind-data:
+  caddy-data:
+  caddy-config:
